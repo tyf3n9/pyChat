@@ -17,7 +17,7 @@ class Storage:
                 found = True
 
         if not found:
-            Storage.__active_users.append( User(username) )
+            Storage.__active_users.append(User(username))
 
         return not found
 
