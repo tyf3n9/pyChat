@@ -17,9 +17,19 @@ class Storage:
                 found = True
 
         if not found:
-            Storage.__active_users.append(User(username))
+            user = User(username)
+            Storage.__active_users.append(user)
+            user.set_timestamp()
 
         return not found
+
+    @staticmethod
+    def remove_user(user):
+        Storage.__active_users.remove(user)
+
+    @staticmethod
+    def get_all_users():
+        return Storage.__active_users
 
     @staticmethod
     def get_channel_list():
