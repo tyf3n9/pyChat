@@ -1,4 +1,3 @@
-from web_server import *
 from login_controller import *
 from channel_list_controller import *
 from select_channel_controller import *
@@ -7,10 +6,13 @@ from send_message_controller import *
 from keep_alive_controller import *
 from repeated_timer import *
 from cleanup import *
+from jwt_middleware import *
 
 
 server = WebServer()
-server.add_route('/login', LoginController)
+server.register_mw(JwtMiddleWare)
+
+server.add_route('/login', LoginController, [JwtMiddleWare])
 server.add_route('/channellist', ChannelListController)
 server.add_route('/selectchannel', SelectChannelController)
 server.add_route('/sendmessage', SendMessageController)

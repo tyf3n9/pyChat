@@ -1,6 +1,12 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http_controller import *
 import urllib.parse as urlparse
+from typing import *
+
+
+class WebMiddleware:
+    def handle_request(self, req: HTTPRequest, res: HTTPResponse):
+        return True
 
 
 class WebServer:
@@ -22,9 +28,13 @@ class WebServer:
         self.__started = False
         self.__port = port
         self.__routes = {}
+        self.__middle_wares = []
 
         self.__server = HTTPServer((address, port), RequestHandler)
         RequestHandler.server = self
+
+    def register_mw(self, mw: Type[WebMiddleware]):
+        self.__middle_wares.append(mw())
 
     def start(self):
         if not self.__started:
@@ -36,13 +46,22 @@ class WebServer:
             self.__started = False
             self.__server.socket.close()
 
-    def add_route(self, route: str, controller: HTTPController):
-        self.__routes[route] = controller
+    def add_route(self, route: str, controller: Type[HTTPController], ignored_mws: List[Type[WebMiddleware]] = []):
+        self.__routes[route] = {'controller': controller, 'ignored_mws': ignored_mws}
 
     def handle_route(self, route: str, req_handler: BaseHTTPRequestHandler, params):
         try:
-            controller = self.__routes[route]
+            controller = self.__routes[route]['controller']
+            ignored_mws = self.__routes[route]['ignored_mws']
             if controller is not None:
-                controller.handle_route(HTTPRequest(route, params), HTTPResponse(req_handler))
+                req = HTTPRequest(route, params, req_handler)
+                res = HTTPResponse(req_handler)
+
+                # call middleware
+                for mw in self.__middle_wares:
+                    if (type(mw) not in ignored_mws) and (not mw.handle_request(req, res)):
+                        return
+
+                controller.handle_route(req, res)
         except KeyError:
             print('No handler for route: ', route)
