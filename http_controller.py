@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 from http import cookies
+from abc import *
 
 
 class HTTPRequest:
@@ -38,6 +39,6 @@ class HTTPResponse:
 
 
 class HTTPController:
-    @staticmethod
-    def handle_route(request: HTTPRequest, response: HTTPResponse):
-        print('Default route handler: ', request.uri)
+    @abstractmethod
+    def handle_route(self, request: HTTPRequest, response: HTTPResponse):
+        pass

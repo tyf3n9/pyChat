@@ -7,7 +7,8 @@ class Token:
     __ALGO = 'HS256'
 
     # in minutes
-    __SESSION_TIME = 3
+    SESSION_TIME = 3
+    LONG_SESSION_TIME = 60
 
     def __init__(self, token_str: str):
 
@@ -21,14 +22,20 @@ class Token:
         return self.__valid
 
     @staticmethod
-    def generate_token_str(user_name: str):
+    def generate_token_str(user_name: str, session_time: int):
         return jwt.encode({
                 'username': user_name,
-                'exp': _datetime.datetime.utcnow() + _datetime.timedelta(minutes=Token.__SESSION_TIME)
+                'exp': _datetime.datetime.utcnow() + _datetime.timedelta(minutes=session_time)
             },
             Token.__SECRET,
             algorithm=Token.__ALGO
         ).decode('utf-8')
 
     def extract_user_name(self):
-        return self.__token['username']
+        if self.is_valid():
+            return self.__token['username']
+        else:
+            return ''
+
+
+

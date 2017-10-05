@@ -2,8 +2,7 @@ from http_controller import *
 
 
 class SendMessageController(HTTPController):
-    @staticmethod
-    def handle_route(req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
         message = req.params['message'][0]
         user = req.mw_data['token']['user_obj']
 

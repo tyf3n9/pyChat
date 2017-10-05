@@ -62,6 +62,6 @@ class WebServer:
                     if (type(mw) not in ignored_mws) and (not mw.handle_request(req, res)):
                         return
 
-                controller.handle_route(req, res)
+                controller().handle_route(req, res)
         except KeyError:
             print('No handler for route: ', route)

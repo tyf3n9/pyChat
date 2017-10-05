@@ -7,12 +7,13 @@ from keep_alive_controller import *
 from repeated_timer import *
 from cleanup import *
 from jwt_middleware import *
-
+from refresh_token_controller import *
 
 server = WebServer()
 server.register_mw(JwtMiddleWare)
 
 server.add_route('/login', LoginController, [JwtMiddleWare])
+server.add_route('/refreshtoken', RefreshTokenController, [JwtMiddleWare])
 server.add_route('/channellist', ChannelListController)
 server.add_route('/selectchannel', SelectChannelController)
 server.add_route('/sendmessage', SendMessageController)

@@ -3,8 +3,7 @@ from http_controller import *
 
 
 class CheckMessagesController(HTTPController):
-    @staticmethod
-    def handle_route(req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
         user = req.mw_data['token']['user_obj']
 
         channel = user.get_channel()
