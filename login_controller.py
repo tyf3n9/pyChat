@@ -12,7 +12,7 @@ class LoginController(HTTPController):
             if len(nick_name) > 0:
                 if not Storage.add_user(nick_name):
                     res.send_status(409)
-                    res.send_response('User exists')
+                    res.end_headers()
                 else:
                     res.send_status(200)
 
