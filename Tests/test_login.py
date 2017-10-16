@@ -56,71 +56,8 @@ class TestLogin(unittest.TestCase):
         r = requests.get(self.URL, {'nickname': ''})
         assert r.status_code == 400
 
-    def test_valid_user(self):
-        user_name = 'test1'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_name_starts_from_numbers(self):
-        user_name = '123test'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_only_numbers(self):
-        user_name = '123890'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_name_with_uppercase(self):
-        user_name = 'TEST1'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_name_camelcase(self):
-        user_name = 'tEsT'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
     def test_long_name(self):
         user_name = '3' * 600
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_specific_name(self):
-        user_name = '&,./###@!^&*'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_complex_name(self):
-        user_name = '&,./###@!^&*12344testTESER_'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_cyrillic_name(self):
-        user_name = 'квест'
-        r = requests.get(self.URL, {'nickname': user_name})
-
-        assert r.status_code == 200
-        self.verify_tokens(r.cookies, user_name)
-
-    def test_cyrillic_name_with_numbers(self):
-        user_name = 'квест123'
         r = requests.get(self.URL, {'nickname': user_name})
 
         assert r.status_code == 200
@@ -138,7 +75,29 @@ class TestLogin(unittest.TestCase):
         self.verify_tokens(p.cookies, user2)
         assert p.status_code == 200
 
-    # TODO: write test which will automatically combine different char classes and test all possible options
+    def test_name_combinations(self):
+        name_list = [
+            '123',
+            '!@#$%^&*()-_=+`\'"\\ <>.,/?:;{}[]|',
+            'TEST',
+            'test',
+            'Тест',
+            'тест'
+        ]
+
+        for name_prefix in name_list:
+            user_name = name_prefix
+            r = requests.get(self.URL, {'nickname': user_name})
+
+            assert user_name == user_name and r.status_code == 200
+            self.verify_tokens(r.cookies, user_name)
+
+            for name_suffix in name_list:
+                user_name = name_prefix + name_suffix
+                r = requests.get(self.URL, {'nickname': user_name})
+
+                assert user_name == user_name and r.status_code == 200
+                self.verify_tokens(r.cookies, user_name)
 
     def test_user_exists(self):
         user_name = 'test1'
