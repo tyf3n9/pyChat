@@ -15,6 +15,7 @@ class RefreshTokenController(HTTPController):
                 res.send_cookie(req.cookies)
                 res.end_headers()
         except KeyError:
-                res.send_status(401)
-                res.send_response('Not authorised')
+                res.send_status(401)    # sent response('Not authorised')
+                res.end_headers()
+
 

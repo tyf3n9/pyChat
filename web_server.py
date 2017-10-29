@@ -64,4 +64,4 @@ class WebServer:
 
                 controller().handle_route(req, res)
         except KeyError:
-            print('No handler for route: ', route)
+            print('No handler for route/controller crashed: ', route)

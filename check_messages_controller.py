@@ -9,8 +9,10 @@ class CheckMessagesController(HTTPController):
         channel = user.get_channel()
 
         if channel is None:
-            res.send_status(404)
-            res.send_response('Channel not found')
+            res.send_status(404)   # 'Channel not found'
+            res.end_headers()
         else:
             res.send_status(200)
+            res.end_headers()
             res.send_response(json.dumps(channel.get_messages()))
+

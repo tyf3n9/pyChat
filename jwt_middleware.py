@@ -26,6 +26,5 @@ class JwtMiddleWare(WebMiddleware):
 
         if not result:
             res.send_status(403)
-            res.send_response('Token expired')
-
-            return result
+            res.end_headers()
+        return result

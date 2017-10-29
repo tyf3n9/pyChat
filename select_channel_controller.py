@@ -4,15 +4,20 @@ from storage import *
 
 class SelectChannelController(HTTPController):
     def handle_route(self, req: HTTPRequest, res: HTTPResponse):
-        channel_name = req.params['channel'][0]
-        user = req.mw_data['token']['user_obj']
+        try:
+            channel_name = req.params['channel'][0]
+            user = req.mw_data['token']['user_obj']
 
-        channel = Storage.get_channel_by_name(channel_name)
+            channel = Storage.get_channel_by_name(channel_name)
 
-        if channel is None:
+            if channel is None:
+                res.send_status(404)
+                res.end_headers()
+            else:
+                user.set_channel(channel)
+                res.send_status(200)
+                res.end_headers()
+                res.send_response(channel_name)
+        except KeyError:
             res.send_status(404)
-            res.send_response('Channel not found')
-        else:
-            user.set_channel(channel)
-            res.send_status(200)
-            res.send_response(channel_name)
+            res.end_headers()
