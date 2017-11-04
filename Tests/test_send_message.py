@@ -6,11 +6,6 @@ import json
 
 
 class TestSendMessage(unittest.TestCase):
-
-    URL = 'http://localhost/sendmessage'
-    LOGIN_URL = 'http://localhost/login'
-    SELECT_CHANNEL_URL = 'http://localhost/selectchannel'
-    LIST_CHANNELS_URL = 'http://localhost/channellist'
     SECRET = 'password'
     ALGO = 'HS256'
 
@@ -24,8 +19,7 @@ class TestSendMessage(unittest.TestCase):
                 'discovery',
                 'beauty',
                 'computers',
-                'cooking',
-                123]
+                'cooking']
 
     def __init__(self, method: str='runTest'):
         super().__init__(methodName=method)
@@ -39,7 +33,7 @@ class TestSendMessage(unittest.TestCase):
 
     def setUp(self):
         self.__process = subprocess.Popen(Const.BACKEND_CMD)
-        r = requests.get(self.LOGIN_URL, {'nickname': 'testuser'})
+        r = requests.get(Const.LOGIN_URL, {'nickname': 'testuser'})
         self.cookies = dict(r.cookies)
 
     def tearDown(self):
@@ -49,14 +43,12 @@ class TestSendMessage(unittest.TestCase):
 
     def get_first_channel(self):
         result = ""
-        r = requests.get(self.LIST_CHANNELS_URL, cookies=self.cookies)
+        r = requests.get(Const.LIST_CHANNELS_URL, cookies=self.cookies)
+        assert r.status_code == 200
         try:
             channel_list = json.loads(r.text)
             if len(channel_list) > 0:
                 result = channel_list[0]
-                assert r.status_code == 200
-            else:
-                assert r.status_code == 200
         except json.JSONDecodeError:
             assert r.status_code == 400
 
@@ -65,36 +57,36 @@ class TestSendMessage(unittest.TestCase):
     def test_valid_message(self):
         message = 'HELLo'
 
-        r = requests.get(self.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
+        r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
         assert r.status_code == 200
-        r = requests.get(self.URL, params={'message': message}, cookies=self.cookies)
+        r = requests.get(Const.SEND_MESSAGE_URL, params={'message': message}, cookies=self.cookies)
         assert r.status_code == 200
 
     def test_send_empty_message(self):
         message = ""
-        r = requests.get(self.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
+        r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
         assert r.status_code == 200
-        r = requests.get(self.URL, params={'message': message}, cookies=self.cookies)
+        r = requests.get(Const.SEND_MESSAGE_URL, params={'message': message}, cookies=self.cookies)
         assert r.status_code == 404
 
     def test_send_message_to_no_channel(self):  # user doesn't select any chanel and try to send message
         message = "No channel selected"
 
-        r = requests.get(self.URL, params={'message': message}, cookies=self.cookies)
+        r = requests.get(Const.SEND_MESSAGE_URL, params={'message': message}, cookies=self.cookies)
         assert r.status_code == 404
 
     def test_no_cookies(self):     # user not authorised and try to send message
         message = "no cookies"
-        r = requests.get(self.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()})
+        r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()})
         assert r.status_code == 403
-        r = requests.get(self.URL, params={'message': message}, cookies=self.cookies)
+        r = requests.get(Const.SEND_MESSAGE_URL, params={'message': message}, cookies=self.cookies)
         assert r.status_code == 404
 
     def test_send_long_message(self):
         message = 'test' * 600
-        r = requests.get(self.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
+        r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': self.get_first_channel()}, cookies=self.cookies)
         assert r.status_code == 200
-        r = requests.get(self.URL, params={'message': message}, cookies=self.cookies)
+        r = requests.get(Const.SEND_MESSAGE_URL, params={'message': message}, cookies=self.cookies)
         assert r.status_code == 200
 
 if __name__ == "__main__":

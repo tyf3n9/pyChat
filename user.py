@@ -21,4 +21,3 @@ class User:
 
     def get_timestamp(self):
         return self.__timestamp
-

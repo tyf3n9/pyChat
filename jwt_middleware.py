@@ -18,7 +18,6 @@ class JwtMiddleWare(WebMiddleware):
                     user = Storage.get_user_by_name(user_name)
 
                 req.mw_data['token'] = {'user_name': user_name, 'user_obj': user}
-                res.send_status(200)
             else:
                 result = False
         except KeyError:

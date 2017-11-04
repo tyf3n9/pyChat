@@ -5,9 +5,6 @@ import subprocess
 
 
 class TestChannel(unittest.TestCase):
-
-    URL = 'http://localhost/selectchannel'
-    LOGIN_URL = 'http://localhost/login'
     SECRET = 'password'
     ALGO = 'HS256'
 
@@ -17,11 +14,10 @@ class TestChannel(unittest.TestCase):
 
     # in seconds
     TIME_DELTA = 10
-    CHANNELS = [
-                'discovery',
+    CHANNELS = ['discovery',
                 'beauty',
                 'computers',
-                'cooking',
+                'cooking'
                 ]
 
     def __init__(self, method: str='runTest'):
@@ -36,7 +32,7 @@ class TestChannel(unittest.TestCase):
 
     def setUp(self):
         self.__process = subprocess.Popen(Const.BACKEND_CMD)
-        r = requests.get(self.LOGIN_URL, {'nickname': 'testuser'})
+        r = requests.get(Const.LOGIN_URL, {'nickname': 'testuser'})
         self.cookies = dict(r.cookies)
 
     def tearDown(self):
@@ -46,20 +42,19 @@ class TestChannel(unittest.TestCase):
 
     def test_no_channel(self):
         channel_name = ''
-        r = requests.get(self.URL, params={'channel': channel_name}, cookies=self.cookies)
+        r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': channel_name}, cookies=self.cookies)
 
         assert r.status_code == 404
 
     def test_valid_channel(self):
-        channel_name = ''
         for channel_name in self.CHANNELS:
-            r = requests.get(self.URL, params={'channel': channel_name}, cookies=self.cookies)
-            assert r.status_code == 200
+            r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': channel_name}, cookies=self.cookies)
+            assert channel_name == channel_name and r.status_code == 200
 
     def test_invalid_channel(self):
         channel_name = "246"
         if channel_name not in self.CHANNELS:
-            r = requests.get(self.URL, params={'channel': channel_name}, cookies=self.cookies)
+            r = requests.get(Const.SELECT_CHANNEL_URL, params={'channel': channel_name}, cookies=self.cookies)
             assert r.status_code == 404
 
 if __name__ == "__main__":
