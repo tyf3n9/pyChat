@@ -1,11 +1,10 @@
-
 from api_token import Token
 from storage import *
 from http_controller import *
 
 
 class LoginController(HTTPController):
-    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse) -> None:
         try:
             nick_name = req.params['nickname'][0]
 
@@ -26,4 +25,3 @@ class LoginController(HTTPController):
         except KeyError:
             res.send_status(400)
             res.end_headers()
-

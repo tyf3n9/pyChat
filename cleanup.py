@@ -3,7 +3,7 @@ from constants import *
 import time
 
 
-def clean_up():
+def clean_up() -> None:
     active_users = Storage.get_all_users()
     print('List of active users:', len(active_users))
     for current_user in active_users:
@@ -13,9 +13,3 @@ def clean_up():
             print('Timeout:', Const.KEEP_ALIVE_TIMEOUT)
             Storage.remove_user(current_user)
             print('Deleted Username:', current_user.get_name())
-
-
-
-
-
-

@@ -4,6 +4,8 @@ import jwt
 import _datetime
 from Tests.const import *
 import subprocess
+import shutil
+import os
 
 
 class TestLogin(unittest.TestCase):
@@ -17,25 +19,28 @@ class TestLogin(unittest.TestCase):
     # in seconds
     TIME_DELTA = 10
 
-    def __init__(self, method: str='runTest'):
+    def __init__(self, method: str='runTest') -> None:
         super().__init__(methodName=method)
         self.__process = None
 
-    def __del__(self):
+    def __del__(self) -> None:
         if self.__process is not None:
             self.__process.kill()
             self.__process = None
 
-    def setUp(self):
-        self.__process = subprocess.Popen(Const.BACKEND_CMD)
+    def setUp(self) -> None:
+        shutil.copy2('./empty_test_db.db', './empty_test_db_copy.db')
+        self.__process = subprocess.Popen(Const.BACKEND_CMD + ' ' + Const.DB_PATH)
+
         print(self.__process)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         if self.__process is not None:
             self.__process.kill()
             self.__process = None
+        os.remove("./empty_test_db_copy.db")
 
-    def verify_tokens(self, cookies: dict, user_name: str):
+    def verify_tokens(self, cookies: dict, user_name: str) -> None:
         token_str = cookies['token']
         token = jwt.decode(str.encode(token_str), self.SECRET, self.ALGO)
 
@@ -51,18 +56,18 @@ class TestLogin(unittest.TestCase):
         session_max = _datetime.datetime.utcnow() + _datetime.timedelta(minutes=self.LONG_SESSION_TIME)
         assert (session_max.second - token['exp']) < self.TIME_DELTA
 
-    def test_empty_user(self):
+    def test_empty_user(self) -> None:
         r = requests.get(Const.LOGIN_URL, {'nickname': ''})
         assert r.status_code == 400
 
-    def test_long_name(self):
+    def test_long_name(self) -> None:
         user_name = '3' * 600
         r = requests.get(Const.LOGIN_URL, {'nickname': user_name})
 
         assert r.status_code == 200
         self.verify_tokens(r.cookies, user_name)
 
-    def test_upper_lower_not_equal(self):
+    def test_upper_lower_not_equal(self) -> None:
         user1 = 'test'
         user2 = 'TEST'
         r = requests.get(Const.LOGIN_URL, {'nickname': user1})
@@ -74,7 +79,7 @@ class TestLogin(unittest.TestCase):
         self.verify_tokens(p.cookies, user2)
         assert p.status_code == 200
 
-    def test_name_combinations(self):
+    def test_name_combinations(self) -> None:
         name_list = [
             '123',
             '!@#$%^&*()-_=+`\'"\\ <>.,/?:;{}[]|',
@@ -98,7 +103,7 @@ class TestLogin(unittest.TestCase):
                 assert user_name == user_name and r.status_code == 200
                 self.verify_tokens(r.cookies, user_name)
 
-    def test_user_exists(self):
+    def test_user_exists(self) -> None:
         user_name = 'test1'
         r = requests.get(Const.LOGIN_URL, {'nickname': user_name})
         p = requests.get(Const.LOGIN_URL, {'nickname': user_name})
@@ -107,7 +112,7 @@ class TestLogin(unittest.TestCase):
         assert r.status_code == 200
         assert p.status_code == 409
 
-    def test_no_params(self):
+    def test_no_params(self) -> None:
         r = requests.get(Const.LOGIN_URL)
         assert r.status_code == 400
 

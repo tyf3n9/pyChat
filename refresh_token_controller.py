@@ -3,7 +3,7 @@ from api_token import *
 
 
 class RefreshTokenController(HTTPController):
-    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse) -> None:
         try:
             token = Token(req.cookies['refresh_token'].value)
             user_name = token.extract_user_name()
@@ -17,5 +17,3 @@ class RefreshTokenController(HTTPController):
         except KeyError:
                 res.send_status(401)    # sent response('Not authorised')
                 res.end_headers()
-
-

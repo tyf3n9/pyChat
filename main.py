@@ -8,6 +8,13 @@ from repeated_timer import *
 from cleanup import *
 from jwt_middleware import *
 from refresh_token_controller import *
+import sys
+from constants import *
+
+db_path = None
+if len(sys.argv) > 1:
+    db_path = sys.argv[1]
+Storage.load(db_path)
 
 server = WebServer()
 server.register_mw(JwtMiddleWare)

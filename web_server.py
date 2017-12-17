@@ -1,11 +1,11 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import HTTPServer
 from http_controller import *
 import urllib.parse as urlparse
 from typing import *
 
 
 class WebMiddleware:
-    def handle_request(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_request(self, req: HTTPRequest, res: HTTPResponse) -> bool:
         return True
 
 
@@ -14,11 +14,12 @@ class WebServer:
     __PORT_DEFAULT = 80
     __ADDRESS_DEFAULT = '0.0.0.0'
 
-    def __init__(self, port: int =__PORT_DEFAULT, address: str =__ADDRESS_DEFAULT):
+    def __init__(self, port: int =__PORT_DEFAULT, address: str =__ADDRESS_DEFAULT) -> None:
         class RequestHandler(BaseHTTPRequestHandler):
             server = None
 
-            def do_GET(self):
+            # noinspection PyPep8Naming
+            def do_GET(self) -> None:
                 params = {}
                 if len(self.path.split('?')) > 1:
                     params = urlparse.parse_qs(self.path.split('?')[1])
@@ -33,23 +34,27 @@ class WebServer:
         self.__server = HTTPServer((address, port), RequestHandler)
         RequestHandler.server = self
 
-    def register_mw(self, mw: Type[WebMiddleware]):
+    def register_mw(self, mw: Type[WebMiddleware]) -> None:
         self.__middle_wares.append(mw())
 
-    def start(self):
+    def start(self) -> None:
         if not self.__started:
             self.__started = True
             self.__server.serve_forever()
 
-    def stop(self):
+    def stop(self) -> None:
         if self.__started:
             self.__started = False
             self.__server.socket.close()
 
-    def add_route(self, route: str, controller: Type[HTTPController], ignored_mws: List[Type[WebMiddleware]] = []):
+    def add_route(self,
+                  route: str,
+                  controller: Type[HTTPController],
+                  ignored_mws: List[Type[WebMiddleware]] = ()
+                  ) -> None:
         self.__routes[route] = {'controller': controller, 'ignored_mws': ignored_mws}
 
-    def handle_route(self, route: str, req_handler: BaseHTTPRequestHandler, params):
+    def handle_route(self, route: str, req_handler: BaseHTTPRequestHandler, params) -> None:
         try:
             controller = self.__routes[route]['controller']
             ignored_mws = self.__routes[route]['ignored_mws']

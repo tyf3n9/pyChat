@@ -6,11 +6,9 @@ import shutil
 
 from Tests.const import *
 import subprocess
-import jwt
-import _datetime
 
 
-class TestRefreshToken(unittest.TestCase):
+class TestKeepAlive(unittest.TestCase):
     SECRET = 'password'
     ALGO = 'HS256'
 
@@ -44,24 +42,6 @@ class TestRefreshToken(unittest.TestCase):
             self.__process = None
         os.remove("./empty_test_db_copy.db")
 
-    def test_successful_refresh(self) -> None:
-        r = requests.get(Const.REFRESH_TOKEN_URL, cookies=self.cookies)
+    def test_successful_keep_alive(self) -> None:
+        r = requests.get(Const.KEEP_ALIVE_URL, cookies=self.cookies)
         assert r.status_code == 200
-
-    def test_unsuccessful_refresh(self) -> None:
-        r = requests.get(Const.REFRESH_TOKEN_URL)
-        assert r.status_code == 401
-
-    def test_expired_refresh_token(self) -> None:
-        exp_refresh_token = jwt.encode({
-                'username': 'testuser',
-                'exp': _datetime.datetime.utcnow() - _datetime.timedelta(minutes=10)
-            },
-            self.SECRET,
-            self.ALGO).decode('utf-8')
-        r = requests.get(Const.REFRESH_TOKEN_URL, exp_refresh_token)
-        assert r.status_code == 401
-
-
-if __name__ == "__main__":
-    unittest.main()

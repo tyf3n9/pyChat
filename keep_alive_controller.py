@@ -2,7 +2,7 @@ from web_server import *
 
 
 class KeepAliveController(HTTPController):
-    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse) -> None:
         user = req.mw_data['token']['user_obj']
 
         user.set_timestamp()

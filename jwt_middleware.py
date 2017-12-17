@@ -5,7 +5,7 @@ from storage import *
 
 
 class JwtMiddleWare(WebMiddleware):
-    def handle_request(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_request(self, req: HTTPRequest, res: HTTPResponse) -> bool:
         result = True
         try:
             token = Token(req.cookies['token'].value)

@@ -2,7 +2,7 @@ from http_controller import *
 
 
 class SendMessageController(HTTPController):
-    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse) -> None:
         try:
             message = req.params['message'][0]
             if len(message) > 0:
@@ -12,7 +12,6 @@ class SendMessageController(HTTPController):
 
                 if channel is None:
                     res.send_status(404)
-                    #res.send_response('Channel not found')
                     res.end_headers()
                 else:
                     channel.add_message(req.mw_data['token']['user_name'], message)

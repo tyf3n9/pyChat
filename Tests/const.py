@@ -1,5 +1,6 @@
 class Const:
     BACKEND_CMD = 'C:/Users/mary/AppData/Local/Programs/Python/Python36-32/python.exe C:/dev/pyChat/main.py'
+    DB_PATH = 'empty_test_db_copy.db'
     CHANNELS = [
         'discovery',
         'beauty',

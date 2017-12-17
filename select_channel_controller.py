@@ -3,7 +3,7 @@ from storage import *
 
 
 class SelectChannelController(HTTPController):
-    def handle_route(self, req: HTTPRequest, res: HTTPResponse):
+    def handle_route(self, req: HTTPRequest, res: HTTPResponse) -> None:
         try:
             channel_name = req.params['channel'][0]
             user = req.mw_data['token']['user_obj']
